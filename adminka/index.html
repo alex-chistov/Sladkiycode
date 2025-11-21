@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smartopolis - Галерея</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Боковое меню -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">🏛️</div>
+        <div class="logo-text">
+          <div class="logo-title">Аналитический центр</div>
+          <div class="logo-status">● Online</div>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <div class="menu-item">
+          <span class="menu-icon">📋</span>
+          <span>Меню</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">🏗️</span>
+          <span>Городские проекты</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">🌆</span>
+          <span>Как изменился город</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">📝</span>
+          <span>830 лет</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">📄</span>
+          <span>Афиша</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">💬</span>
+          <span>Населенный пункт</span>
+        </div>
+        <div class="menu-item active">
+          <span class="menu-icon">📸</span>
+          <span>ПОС</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">📊</span>
+          <span>Модераторов</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">🗺️</span>
+          <span>Карты</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">📰</span>
+          <span>Новости</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">📍</span>
+          <span>Инициативы</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">🗳️</span>
+          <span>Голосования</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">💭</span>
+          <span>Все комментарии</span>
+        </div>
+        <div class="menu-item">
+          <span class="menu-icon">🔧</span>
+          <span>Настройки</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+      <header class="content-header">
+        <h1>
+          Сообщения
+          <button class="btn-show">Показать</button>
+        </h1>
+      </header>
+
+      <div class="card-section">
+        <h3>Карточка сообщения</h3>
+        <div class="id-field">
+          <label>Id</label>
+          <span>170512</span>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="card">Подробно</div>
+        <div class="tab" data-tab="address">Адрес</div>
+        <div class="tab" data-tab="comments">Комментарии (0)</div>
+        <div class="tab" data-tab="processing">Обработка</div>
+        <div class="tab" data-tab="history">История изменений</div>
+      </div>
+
+      <div class="content-body">
+        <!-- Вкладка: Карточка сообщения -->
+        <div class="tab-content active" id="tab-card">
+          <section class="form-section">
+            <div class="section-header">
+              <h2>Сообщение</h2>
+              <div class="action-buttons">
+                <button class="btn btn-secondary">
+                  <span class="btn-icon">📁</span>
+                  Вернуться к фильтрам
+                </button>
+                <button class="btn btn-secondary">
+                  <span class="btn-icon">📄</span>
+                  Список
+                </button>
+                <button class="btn btn-primary">
+                  <span class="btn-icon">✏️</span>
+                  Редактировать
+                </button>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-field">
+                <label>#</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="170512"
+                  readonly
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Заголовок</label>
+                <input type="text" class="field-input" value="Другое" />
+              </div>
+
+              <div class="form-field">
+                <label>Описание</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="Описание заявки..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Тип проблемы</label>
+                <input type="text" class="field-input" value="Другое" />
+              </div>
+
+              <div class="form-field">
+                <label>ЕСИА</label>
+                <input type="text" class="field-input" value="нет" />
+              </div>
+
+              <div class="form-field">
+                <label>Автор</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="Руслан Иванов Иванович"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Email автора</label>
+                <input
+                  type="email"
+                  class="field-input"
+                  value="79875407693@phone.email"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Телефон автора</label>
+                <input type="tel" class="field-input" value="+79875407693" />
+              </div>
+
+              <div class="form-field">
+                <label>Адрес автора</label>
+                <input type="text" class="field-input" value="" />
+              </div>
+
+              <div class="form-field">
+                <label>Видно всем</label>
+                <input type="text" class="field-input" value="нет" />
+              </div>
+
+              <div class="form-field">
+                <label>Публиковать результат</label>
+                <input type="text" class="field-input" value="нет" />
+              </div>
+
+              <div class="form-field">
+                <label>Назначен</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="Аналитический центр города"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Изображения</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value=""
+                  placeholder="Загрузить изображения"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Ссылки на вложения</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value=""
+                  placeholder="Добавить ссылки"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Видео</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value=""
+                  placeholder="Добавить видео"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Изображения (Стало)</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value=""
+                  placeholder="Загрузить изображения"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Дата создания</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="2025-11-21 14:33:49"
+                  readonly
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Срок исполнения в нашей системе</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="2025-11-28 00:00:00"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Истекает через, дней</label>
+                <input
+                  type="number"
+                  class="field-input"
+                  value=""
+                  placeholder="Дней"
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Нормативный срок</label>
+                <input type="text" class="field-input" value="" />
+              </div>
+
+              <div class="form-field">
+                <label>Внешняя система (откуда пришла)</label>
+                <input
+                  type="text"
+                  class="field-input"
+                  value="Лобачевский"
+                  readonly
+                />
+              </div>
+
+              <div class="form-field">
+                <label>Орган власти</label>
+                <input type="text" class="field-input" value="" />
+              </div>
+
+              <div class="form-field">
+                <label>Внешний ID (откуда пришла)</label>
+                <input type="text" class="field-input" value="" />
+              </div>
+
+              <div class="form-field">
+                <label>Внешняя категория (откуда пришла)</label>
+                <input type="text" class="field-input" value="" />
+              </div>
+
+              <div class="form-field">
+                <label>Ссылка на обращение</label>
+                <input
+                  type="url"
+                  class="field-input"
+                  value=""
+                  placeholder="https://"
+                />
+              </div>
+
+              <div class="form-field status-field">
+                <label>Статус</label>
+                <div class="field-value">
+                  <button class="btn btn-dark">Закрыть</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Вкладка: Обработка -->
+        <div class="tab-content" id="tab-processing">
+          <section class="form-section">
+            <h2>Действия с сообщением</h2>
+
+            <div class="form-grid">
+              <div class="form-field select-field">
+                <label><span class="required">*</span> Действия</label>
+                <div class="field-value">
+                  <select class="custom-select">
+                    <option>Новое</option>
+                    <option>Назначить ответственному</option>
+                    <option>Отклонение</option>
+                    <option>Действие снято в ручном режиме</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-field toggle-field">
+                <label>Публиковать результат</label>
+                <div class="field-value">
+                  <label class="toggle">
+                    <input type="checkbox" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">OFF</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-field toggle-field">
+                <label>Видно всем</label>
+                <div class="field-value">
+                  <label class="toggle">
+                    <input type="checkbox" />
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">OFF</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-field rating-field">
+                <label>Оценка ответа</label>
+                <div class="field-value">
+                  <div class="rating-group">
+                    <select class="custom-select rating-select">
+                      <option>-</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                    </select>
+                    <button class="btn btn-info">Оценить</button>
+                  </div>
+                  <div class="info-message">
+                    <span class="info-icon">ℹ️</span>
+                    <span>Сообщение еще не было оценено</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field select-field">
+                <label><span class="required">*</span> Назначен</label>
+                <div class="field-value">
+                  <select class="custom-select">
+                    <option>Назначен</option>
+                    <option>Аналитический центр города</option>
+                    <option>Другой исполнитель</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-field file-field">
+                <label>Изображения (Стало)</label>
+                <div class="field-value">
+                  <div class="file-input-group">
+                    <input
+                      type="text"
+                      class="custom-input"
+                      placeholder="Выбор изображения"
+                      readonly
+                    />
+                    <button class="btn btn-file">
+                      <span class="btn-icon">📁</span>
+                      Выбор файла
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field textarea-field">
+                <label>Официальный ответ</label>
+                <div class="field-value">
+                  <textarea
+                    class="custom-textarea"
+                    rows="5"
+                    placeholder="Решил проблему"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-field textarea-field">
+                <label>Причина возврата</label>
+                <div class="field-value">
+                  <textarea
+                    class="custom-textarea"
+                    rows="5"
+                    placeholder="Введите причину возврата"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-field file-field">
+                <label>Фотографии к причине возврата</label>
+                <div class="field-value">
+                  <div class="file-input-group">
+                    <input
+                      type="text"
+                      class="custom-input"
+                      placeholder="Выбор изображения"
+                      readonly
+                    />
+                    <button class="btn btn-file">
+                      <span class="btn-icon">📁</span>
+                      Выбор файла
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field textarea-field">
+                <label>Ответ в смс</label>
+                <div class="field-value">
+                  <textarea
+                    class="custom-textarea"
+                    rows="4"
+                    placeholder="Введите Ответ в смс"
+                  ></textarea>
+                  <div class="char-limit-info">
+                    <span class="info-icon">ℹ️</span>
+                    <span>Ограничено количество символов до 70</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field editable-field">
+                <label>Телефон автора</label>
+                <div class="field-value">
+                  <div class="editable-input-group">
+                    <span class="edit-icon">✏️</span>
+                    <input
+                      type="text"
+                      class="editable-input"
+                      value="+79875407693"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field button-field">
+                <label>Отправить смс</label>
+                <div class="field-value">
+                  <button class="btn btn-success">
+                    <span class="btn-icon">📤</span>
+                    Отправить
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-field editable-field">
+                <label>Дата отправки смс</label>
+                <div class="field-value">
+                  <div class="editable-input-group">
+                    <span class="edit-icon">✏️</span>
+                    <input
+                      type="text"
+                      class="editable-input"
+                      value="не отправлено"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field file-field">
+                <label>Прикреплённые документы</label>
+                <div class="field-value">
+                  <div class="file-input-group">
+                    <input
+                      type="text"
+                      class="custom-input"
+                      placeholder="Выбор файла"
+                      readonly
+                    />
+                    <button class="btn btn-file">
+                      <span class="btn-icon">📁</span>
+                      Выбор файла
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field date-field">
+                <label
+                  ><span class="required">*</span> Срок исполнения в нашей
+                  системе</label
+                >
+                <div class="field-value">
+                  <div class="date-input-group">
+                    <span class="calendar-icon">📅</span>
+                    <input
+                      type="text"
+                      class="date-input"
+                      value="2025-11-28 00:00:00"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-warning">Сбросить</button>
+              <div class="right-actions">
+                <label class="checkbox-label">
+                  <input type="checkbox" checked />
+                  <span>Посмотреть</span>
+                </label>
+                <button class="btn btn-primary-submit">Отправить</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Вкладка: История изменений -->
+        <div class="tab-content" id="tab-history">
+          <section class="history-section">
+            <div class="history-table">
+              <div class="history-header">
+                <div class="history-col-date">Дата</div>
+                <div class="history-col-author">Автор</div>
+                <div class="history-col-changes">Изменено</div>
+              </div>
+
+              <div class="history-row">
+                <div class="history-col-date">2025-11-21 19:38:42</div>
+                <div class="history-col-author">
+                  [276] Аналитический центр города
+                </div>
+                <div class="history-col-changes">
+                  <div class="change-item">
+                    <span class="change-label">Статус</span>
+                    <div class="change-value">
+                      <span class="badge badge-red">Проблема решена</span>
+                      <span class="arrow">⇒</span>
+                      <span class="badge badge-dark">Закрыто</span>
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Официальный ответ</span>
+                    <div class="change-value">
+                      <span>Дядя вася заплатил яму</span>
+                      <span class="arrow">⇒</span>
+                      <span
+                        >Уважаемый пользователь, Дядя вася заплатил яму</span
+                      >
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Дата финального статуса</span>
+                    <div class="change-value">
+                      <span>2025-11-21</span>
+                      <span class="arrow">⇒</span>
+                      <span>2025-11-21</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="history-row">
+                <div class="history-col-date">2025-11-21 19:37:41</div>
+                <div class="history-col-author">
+                  [276] Аналитический центр города
+                </div>
+                <div class="history-col-changes">
+                  <div class="change-item">
+                    <span class="change-label">Статус</span>
+                    <div class="change-value">
+                      <span class="badge badge-blue"
+                        >Взято в работу ответственным</span
+                      >
+                      <span class="arrow">⇒</span>
+                      <span class="badge badge-red">Проблема решена</span>
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Официальный ответ</span>
+                    <div class="change-value">
+                      <span class="arrow">⇒</span>
+                      <span>Дядя вася заплатил яму</span>
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Дата финального статуса</span>
+                    <div class="change-value">
+                      <span class="arrow">⇒</span>
+                      <span>2025-11-21</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="history-row">
+                <div class="history-col-date">2025-11-21 19:36:50</div>
+                <div class="history-col-author">
+                  [276] Аналитический центр города
+                </div>
+                <div class="history-col-changes">
+                  <div class="change-item">
+                    <span class="change-label">Статус</span>
+                    <div class="change-value">
+                      <span class="badge badge-blue-light"
+                        >Назначено ответственному</span
+                      >
+                      <span class="arrow">⇒</span>
+                      <span class="badge badge-blue"
+                        >Взято в работу ответственным</span
+                      >
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Назначено</span>
+                    <div class="change-value">
+                      <span>Администрация Нижегородского района</span>
+                      <span class="arrow">⇒</span>
+                      <span>Аналитический центр города</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="history-row">
+                <div class="history-col-date">2025-11-21 19:36:20</div>
+                <div class="history-col-author">
+                  [276] Аналитический центр города
+                </div>
+                <div class="history-col-changes">
+                  <div class="change-item">
+                    <span class="change-label">Статус</span>
+                    <div class="change-value">
+                      <span class="badge badge-orange">На модерации</span>
+                      <span class="arrow">⇒</span>
+                      <span class="badge badge-blue-light"
+                        >Назначено ответственному</span
+                      >
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Назначено</span>
+                    <div class="change-value">
+                      <span>Аналитический центр города</span>
+                      <span class="arrow">⇒</span>
+                      <span>Администрация Нижегородского района</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="history-row">
+                <div class="history-col-date">2025-11-21 19:35:33</div>
+                <div class="history-col-author">
+                  [276] Аналитический центр города
+                </div>
+                <div class="history-col-changes">
+                  <div class="change-item">
+                    <span class="change-label">Статус</span>
+                    <div class="change-value">
+                      <span class="badge badge-orange">Новое</span>
+                      <span class="arrow">⇒</span>
+                      <span class="badge badge-orange">На модерации</span>
+                    </div>
+                  </div>
+                  <div class="change-item">
+                    <span class="change-label">Назначено</span>
+                    <div class="change-value">
+                      <span class="arrow">⇒</span>
+                      <span>Аналитический центр города</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Модальное окно для просмотра фото -->
+    <div id="modal" class="modal">
+      <span class="close">&times;</span>
+      <img class="modal-content" id="modal-img" />
+      <div id="caption"></div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

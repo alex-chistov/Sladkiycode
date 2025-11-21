@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Обращение - Платформа «Лобачевский»</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f5f5f5;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background-color: #fff;
+        padding: 15px 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .header-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+        flex: 1;
+      }
+
+      .header-link {
+        color: #0066cc;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .header-link:hover {
+        color: #0052a3;
+        text-decoration: underline;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1140px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+
+      /* Breadcrumbs */
+      .breadcrumbs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .breadcrumbs a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+
+      .breadcrumbs a:hover {
+        text-decoration: underline;
+      }
+
+      .breadcrumbs-separator {
+        color: #999;
+      }
+
+      /* Page Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+
+      .page-title {
+        font-size: 36px;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .btn-new-application {
+        background: transparent;
+        color: #0066cc;
+        border: none;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        transition: color 0.2s;
+      }
+
+      .btn-new-application:hover {
+        color: #0052a3;
+      }
+
+      /* Layout */
+      .content-layout {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 32px;
+      }
+
+      /* Main Content */
+      .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* Card */
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .card-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 16px;
+      }
+
+      .card-subtitle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        color: #0066cc;
+        font-weight: 500;
+      }
+
+      .card-text {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .read-more {
+        color: #0066cc;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 15px;
+        padding: 0;
+        margin-top: 8px;
+        display: inline-block;
+      }
+
+      .read-more:hover {
+        color: #0052a3;
+      }
+
+      /* Address Section */
+      .address-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .address-text {
+        font-size: 16px;
+        color: #000;
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+
+      .map-placeholder {
+        width: 100%;
+        height: 200px;
+        background: #e9ecef;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 14px;
+        overflow: hidden;
+      }
+
+      .map-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .status-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .status-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 20px;
+      }
+
+      /* Timeline */
+      .timeline {
+        position: relative;
+        padding-left: 32px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 12px;
+        bottom: 12px;
+        width: 2px;
+        background: #e0e0e0;
+      }
+
+      .timeline-item {
+        position: relative;
+        margin-bottom: 24px;
+      }
+
+      .timeline-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .timeline-dot {
+        position: absolute;
+        left: -28px;
+        top: 4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #0066cc;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px #0066cc;
+        z-index: 1;
+      }
+
+      .timeline-dot.completed {
+        background: #0066cc;
+        box-shadow: 0 0 0 2px #0066cc;
+      }
+
+      .timeline-dot.current {
+        background: #fff;
+        border-color: #0066cc;
+        box-shadow: 0 0 0 2px #0066cc;
+      }
+
+      .timeline-status {
+        font-size: 15px;
+        font-weight: 500;
+        color: #000;
+        margin-bottom: 4px;
+      }
+
+      .timeline-date {
+        font-size: 13px;
+        color: #666;
+      }
+
+      .timeline-executor {
+        font-size: 13px;
+        color: #666;
+        margin-top: 4px;
+        font-style: italic;
+      }
+
+      /* Loading */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      /* Error */
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 40px 0;
+      }
+
+      /* Responsive */
+      @media (max-width: 968px) {
+        .content-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          order: -1;
+        }
+
+        .page-title {
+          font-size: 28px;
+        }
+
+        .header {
+          padding: 15px 20px;
+        }
+
+        .card {
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect
+            x="5"
+            y="5"
+            width="30"
+            height="30"
+            stroke="#000"
+            stroke-width="2"
+            fill="none"
+          />
+          <path
+            d="M15 20 L20 25 L25 15"
+            stroke="#000"
+            stroke-width="2"
+            fill="none"
+          />
+        </svg>
+      </div>
+      <div class="header-title">Платформа «Лобачевский»</div>
+      <a href="my-applications.html" class="header-link">Мои заявки</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Breadcrumbs -->
+      <div class="breadcrumbs">
+        <a href="my-applications.html">Мои заявки</a>
+        <span class="breadcrumbs-separator">›</span>
+        <span id="breadcrumbTitle">Обращение</span>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading">Загрузка данных...</div>
+
+      <!-- Error State -->
+      <div id="errorState" class="error-message" style="display: none">
+        Не удалось загрузить данные о заявке
+      </div>
+
+      <!-- Content (Hidden by default) -->
+      <div id="contentArea" style="display: none">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1 class="page-title" id="pageTitle">Обращение</h1>
+          <button class="btn-new-application" onclick="createNewApplication()">
+            Создать заявку
+          </button>
+        </div>
+
+        <!-- Content Layout -->
+        <div class="content-layout">
+          <!-- Main Content -->
+          <div class="main-content">
+            <!-- Official Response -->
+            <div class="card" id="responseCard" style="display: none">
+              <h2 class="card-title">Ответ на заявку</h2>
+              <div class="card-subtitle">
+                <span>Исполнитель: <span id="executorName">-</span></span>
+              </div>
+              <div class="card-text" id="responseText"></div>
+            </div>
+
+            <!-- Details -->
+            <div class="card">
+              <h2 class="card-title">Детали заявки</h2>
+              <div class="card-subtitle">
+                <span id="detailsSubtitle">Тема</span>
+              </div>
+              <div class="card-text" id="descriptionText"></div>
+              <button
+                class="read-more"
+                id="readMoreBtn"
+                style="display: none"
+                onclick="toggleDescription()"
+              >
+                Читать далее
+              </button>
+            </div>
+
+            <!-- Address -->
+            <div class="card">
+              <div class="address-label">Адрес</div>
+              <div class="address-text" id="addressText">-</div>
+              <div class="map-placeholder" id="mapArea">
+                <span>Карта недоступна</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="sidebar">
+            <!-- Status Timeline -->
+            <div class="status-card">
+              <h3 class="status-card-title">Статусы заявки</h3>
+              <div class="timeline" id="statusTimeline">
+                <!-- Timeline items will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+      let complaint = null;
+      let isDescriptionExpanded = false;
+
+      // Get complaint ID from URL
+      function getComplaintIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("id");
+      }
+
+      // Format date
+      function formatDate(dateString) {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        const options = {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        const formatted = date.toLocaleDateString("ru-RU", options);
+        return formatted.replace(",", " г. в");
+      }
+
+      // Format date short
+      function formatDateShort(dateString) {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        const options = { day: "numeric", month: "long", year: "numeric" };
+        return date.toLocaleDateString("ru-RU", options) + " года";
+      }
+
+      // Toggle description
+      function toggleDescription() {
+        const descEl = document.getElementById("descriptionText");
+        const btnEl = document.getElementById("readMoreBtn");
+
+        if (isDescriptionExpanded) {
+          descEl.textContent = truncateText(complaint.description || "", 200);
+          btnEl.textContent = "Читать далее";
+        } else {
+          descEl.textContent = complaint.description || "Нет описания";
+          btnEl.textContent = "Свернуть";
+        }
+        isDescriptionExpanded = !isDescriptionExpanded;
+      }
+
+      // Truncate text
+      function truncateText(text, maxLength) {
+        if (!text) return "";
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + "...";
+      }
+
+      // Build status timeline
+      function buildTimeline() {
+        const timeline = document.getElementById("statusTimeline");
+        timeline.innerHTML = "";
+
+        // Create timeline from complaint data
+        const statuses = [];
+
+        // Add creation
+        statuses.push({
+          status: "Отправлено",
+          date: complaint.created_at || complaint.created_date,
+          executor: null,
+        });
+
+        // Add current status if different
+        if (complaint.status && complaint.status !== "Новое") {
+          statuses.push({
+            status: complaint.status,
+            date: complaint.updated_at || complaint.created_at,
+            executor: complaint.assigned_to,
+          });
+        }
+
+        // Render timeline items
+        statuses.forEach((item, index) => {
+          const isLast = index === statuses.length - 1;
+          const timelineItem = document.createElement("div");
+          timelineItem.className = "timeline-item";
+
+          const dotClass = isLast ? "current" : "completed";
+          let html = `
+            <div class="timeline-dot ${dotClass}"></div>
+            <div class="timeline-status">${item.status}</div>
+            <div class="timeline-date">${formatDate(item.date)}</div>
+          `;
+
+          if (item.executor) {
+            html += `<div class="timeline-executor">Назначен исполнитель: ${item.executor}</div>`;
+          }
+
+          timelineItem.innerHTML = html;
+          timeline.appendChild(timelineItem);
+        });
+
+        // Add days info if completed
+        if (
+          complaint.status === "Решено" ||
+          complaint.status === "Выполнено" ||
+          complaint.status === "Закрыто"
+        ) {
+          const createdDate = new Date(
+            complaint.created_at || complaint.created_date
+          );
+          const completedDate = new Date(complaint.updated_at || new Date());
+          const daysDiff = Math.floor(
+            (completedDate - createdDate) / (1000 * 60 * 60 * 24)
+          );
+
+          const finalItem = document.createElement("div");
+          finalItem.className = "timeline-item";
+          finalItem.innerHTML = `
+            <div class="timeline-dot completed"></div>
+            <div class="timeline-status">Ответ дан за ${daysDiff} ${getDaysWord(
+            daysDiff
+          )}</div>
+            <div class="timeline-date">${formatDate(complaint.updated_at)}</div>
+          `;
+          timeline.appendChild(finalItem);
+        }
+      }
+
+      // Get days word form
+      function getDaysWord(days) {
+        if (days === 0) return "дней";
+        if (days % 10 === 1 && days % 100 !== 11) return "день";
+        if (
+          days % 10 >= 2 &&
+          days % 10 <= 4 &&
+          (days % 100 < 10 || days % 100 >= 20)
+        )
+          return "дня";
+        return "дней";
+      }
+
+      // Load map
+      function loadMap(address) {
+        if (!address) return;
+
+        // Try to create a simple static map preview
+        const mapArea = document.getElementById("mapArea");
+
+        // For demo, show placeholder with address
+        mapArea.innerHTML = `
+          <div style="width: 100%; height: 100%; background: #e9ecef; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 20px; text-align: center;">
+            <div style="font-size: 14px; color: #666; margin-bottom: 8px;">📍 Местоположение:</div>
+            <div style="font-size: 16px; color: #333; font-weight: 500;">${address}</div>
+          </div>
+        `;
+      }
+
+      // Load complaint data
+      async function loadComplaint() {
+        const id = getComplaintIdFromUrl();
+
+        if (!id) {
+          showError("ID заявки не указан");
+          return;
+        }
+
+        try {
+          complaint = await ComplaintsAPI.getComplaintById(id);
+
+          if (!complaint) {
+            showError("Заявка не найдена");
+            return;
+          }
+
+          // Update page
+          document.getElementById(
+            "breadcrumbTitle"
+          ).textContent = `Обращение № ${complaint.id}`;
+          document.getElementById(
+            "pageTitle"
+          ).textContent = `Обращение № ${complaint.id}`;
+
+          // Set description
+          const description = complaint.description || "Нет описания";
+          const descEl = document.getElementById("descriptionText");
+
+          if (description.length > 200) {
+            descEl.textContent = truncateText(description, 200);
+            document.getElementById("readMoreBtn").style.display =
+              "inline-block";
+          } else {
+            descEl.textContent = description;
+          }
+
+          // Set subtitle
+          const subtitle =
+            complaint.problem_type || complaint.title || "Детали";
+          document.getElementById("detailsSubtitle").textContent = subtitle;
+
+          // Set address
+          const address = complaint.author_address || "Адрес не указан";
+          document.getElementById("addressText").textContent = address;
+          loadMap(address);
+
+          // Show response if exists
+          if (complaint.official_response) {
+            document.getElementById("responseCard").style.display = "block";
+            document.getElementById("responseText").textContent =
+              complaint.official_response;
+            document.getElementById("executorName").textContent =
+              complaint.assigned_to || "Администрация";
+          }
+
+          // Build timeline
+          buildTimeline();
+
+          // Show content
+          showContent();
+        } catch (error) {
+          console.error("Ошибка загрузки заявки:", error);
+          showError("Не удалось загрузить данные заявки");
+        }
+      }
+
+      // Show content
+      function showContent() {
+        document.getElementById("loadingState").style.display = "none";
+        document.getElementById("errorState").style.display = "none";
+        document.getElementById("contentArea").style.display = "block";
+      }
+
+      // Show error
+      function showError(message) {
+        document.getElementById("loadingState").style.display = "none";
+        document.getElementById("contentArea").style.display = "none";
+        const errorEl = document.getElementById("errorState");
+        errorEl.textContent = message;
+        errorEl.style.display = "block";
+      }
+
+      // Create new application
+      function createNewApplication() {
+        window.location.href = "index.html";
+      }
+
+      // Initialize on load
+      window.addEventListener("load", loadComplaint);
+    </script>
+  </body>
+</html>

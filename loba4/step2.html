@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Платформа «Лобачевский» - Личные данные</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f5f5f5;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background-color: #fff;
+        padding: 15px 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .header-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+        flex: 1;
+      }
+
+      .header-link {
+        color: #0066cc;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .header-link:hover {
+        color: #0052a3;
+        text-decoration: underline;
+      }
+
+      /* Container */
+      .container {
+        max-width: 800px;
+        margin: 60px auto;
+        padding: 0 20px;
+      }
+
+      /* Form Card */
+      .form-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 48px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      /* Header Section */
+      .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .form-title {
+        font-size: 32px;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .step-indicator {
+        background: #fff;
+        border: 1px solid #0066cc;
+        color: #0066cc;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      /* Form Description */
+      .form-description {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 32px;
+        line-height: 1.5;
+      }
+
+      /* Form Group */
+      .form-group {
+        margin-bottom: 24px;
+      }
+
+      .form-label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 8px;
+        font-size: 15px;
+        color: #333;
+        font-weight: 500;
+      }
+
+      .required {
+        color: #d32f2f;
+      }
+
+      /* Input */
+      input[type="text"],
+      input[type="tel"] {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+        font-family: inherit;
+        transition: border-color 0.2s;
+      }
+
+      input[type="text"]:focus,
+      input[type="tel"]:focus {
+        outline: none;
+        border-color: #0066cc;
+      }
+
+      input::placeholder {
+        color: #bbb;
+      }
+
+      /* Checkbox */
+      .checkbox-group {
+        margin: 32px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .checkbox-wrapper {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+      }
+
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .checkbox-label {
+        font-size: 14px;
+        color: #333;
+        line-height: 1.6;
+        cursor: pointer;
+      }
+
+      .checkbox-label a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+
+      .checkbox-label a:hover {
+        text-decoration: underline;
+      }
+
+      /* Buttons */
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 40px;
+      }
+
+      .btn {
+        border: none;
+        padding: 14px 40px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+      }
+
+      .btn-primary {
+        background: #95b3d4;
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #7a9bc4;
+      }
+
+      .btn-primary:disabled {
+        background: #95b3d4;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .form-card {
+          padding: 32px 24px;
+        }
+
+        .form-title {
+          font-size: 24px;
+        }
+
+        .header {
+          padding: 15px 20px;
+        }
+
+        .btn-container {
+          flex-direction: column-reverse;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect
+            x="5"
+            y="5"
+            width="30"
+            height="30"
+            stroke="#000"
+            stroke-width="2"
+            fill="none"
+          />
+          <path
+            d="M15 20 L20 25 L25 15"
+            stroke="#000"
+            stroke-width="2"
+            fill="none"
+          />
+        </svg>
+      </div>
+      <div class="header-title">Платформа «Лобачевский»</div>
+      <a href="my-applications.html" class="header-link">Мои заявки</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="form-card">
+        <!-- Form Header -->
+        <div class="form-header">
+          <h1 class="form-title">Личные данные</h1>
+          <div class="step-indicator">Шаг 2 из 2</div>
+        </div>
+
+        <!-- Description -->
+        <p class="form-description">
+          Введите ваши контактные данные, чтобы мы смогли с вами связаться.
+        </p>
+
+        <!-- Form -->
+        <form id="personalDataForm">
+          <!-- Фамилия -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="required">*</span>
+              Фамилия
+            </label>
+            <input type="text" id="lastName" required />
+          </div>
+
+          <!-- Имя -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="required">*</span>
+              Имя
+            </label>
+            <input type="text" id="firstName" required />
+          </div>
+
+          <!-- Отчество -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="required">*</span>
+              Отчество
+            </label>
+            <input type="text" id="middleName" required />
+          </div>
+
+          <!-- Телефон -->
+          <div class="form-group">
+            <label class="form-label">
+              <span class="required">*</span>
+              Телефон
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              placeholder="+7 (999) 123-45-67"
+              required
+            />
+          </div>
+
+          <!-- Checkbox Agreement -->
+          <div class="checkbox-group">
+            <input type="checkbox" id="agreement" required />
+            <label for="agreement" class="checkbox-label">
+              Я
+              <a
+                href="#"
+                onclick="event.preventDefault(); alert('Ссылка на правила обработки данных');"
+                >соглашаюсь</a
+              >
+              на обработку персональный данных в соответствии с
+              <a
+                href="#"
+                onclick="event.preventDefault(); alert('Ссылка на правила');"
+                >Правилами обработки персональных данных</a
+              >
+              и принимаю условия
+              <a
+                href="#"
+                onclick="event.preventDefault(); alert('Ссылка на пользовательское соглашение');"
+                >пользовательского соглашения интеграционной платформы
+                информационных систем и ресурсов администрации города Нижнего
+                Новгорода «Лобачевский»</a
+              >
+            </label>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="btn-container">
+            <button type="button" class="btn btn-secondary" onclick="goBack()">
+              Назад
+            </button>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+      // Phone mask
+      const phoneInput = document.getElementById("phone");
+      phoneInput.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length > 0) {
+          if (value[0] !== "7") {
+            value = "7" + value;
+          }
+          let formattedValue = "+7";
+          if (value.length > 1) {
+            formattedValue += " (" + value.substring(1, 4);
+          }
+          if (value.length >= 5) {
+            formattedValue += ") " + value.substring(4, 7);
+          }
+          if (value.length >= 8) {
+            formattedValue += "-" + value.substring(7, 9);
+          }
+          if (value.length >= 10) {
+            formattedValue += "-" + value.substring(9, 11);
+          }
+          e.target.value = formattedValue;
+        }
+      });
+
+      // Go back function
+      function goBack() {
+        window.history.back();
+      }
+
+      // Form submission
+      document
+        .getElementById("personalDataForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const agreement = document.getElementById("agreement");
+          if (!agreement.checked) {
+            alert(
+              "Пожалуйста, дайте согласие на обработку персональных данных"
+            );
+            return;
+          }
+
+          // Собираем данные формы
+          const lastName = document.getElementById("lastName").value;
+          const firstName = document.getElementById("firstName").value;
+          const middleName = document.getElementById("middleName").value;
+          const phone = document.getElementById("phone").value;
+
+          // Получаем данные из первого шага (из sessionStorage)
+          const step1Data = JSON.parse(
+            sessionStorage.getItem("step1Data") || "{}"
+          );
+
+          // Формируем полное имя автора
+          const fullName = `${lastName} ${firstName} ${middleName}`;
+
+          // Подготавливаем данные для отправки в БД
+          const complaintData = {
+            title: step1Data.address || "Заявка с платформы Лобачевский",
+            description: step1Data.description || "",
+            author: fullName,
+            author_phone: phone,
+            author_address: step1Data.address || "",
+            status: "Новое",
+            external_system: "Сайт lbch.ru",
+            created_date: new Date().toISOString(),
+          };
+
+          console.log("📤 Отправка заявки:", complaintData);
+
+          try {
+            // Отправляем заявку на сервер
+            const result = await ComplaintsAPI.createComplaint(complaintData);
+
+            console.log("✅ Заявка создана, ID:", result.id);
+
+            // Сохраняем номер телефона для личного кабинета
+            localStorage.setItem("userPhone", phone);
+            localStorage.setItem("lastComplaintId", result.id);
+
+            // Очищаем данные первого шага
+            sessionStorage.removeItem("step1Data");
+
+            // Показываем сообщение с возможностью перехода к заявке
+            if (
+              confirm(
+                `✅ Заявка успешно отправлена!\n\nНомер заявки: №${result.id}\n\nХотите открыть заявку для просмотра?`
+              )
+            ) {
+              // Переходим к детальному просмотру заявки
+              window.location.href = `complaint-detail.html?id=${result.id}`;
+            } else {
+              // Переходим в личный кабинет
+              window.location.href = "my-applications.html";
+            }
+          } catch (error) {
+            console.error("❌ Ошибка отправки заявки:", error);
+            alert(
+              "Произошла ошибка при отправке заявки. Пожалуйста, убедитесь, что сервер запущен (npm start в папке adminka), и попробуйте снова."
+            );
+          }
+        });
+    </script>
+  </body>
+</html>

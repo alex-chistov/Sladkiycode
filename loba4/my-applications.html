@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Платформа «Лобачевский» - Мои заявки</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f5f5f5;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background-color: #fff;
+        padding: 15px 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .header-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1140px;
+        margin: 60px auto;
+        padding: 0 20px;
+      }
+
+      /* Page Header */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+
+      .page-title {
+        font-size: 36px;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .btn-new-application {
+        background: transparent;
+        color: #0066cc;
+        border: none;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        transition: color 0.2s;
+      }
+
+      .btn-new-application:hover {
+        color: #0052a3;
+      }
+
+      /* Phone Search Card */
+      .phone-search-card {
+        background: #f5f5f5;
+        border-radius: 12px;
+        padding: 24px 32px;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .phone-search-content {
+        flex: 1;
+      }
+
+      .phone-number {
+        font-size: 20px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 4px;
+      }
+
+      .phone-search-label {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .arrow-icon {
+        width: 24px;
+        height: 24px;
+        color: #999;
+      }
+
+      /* Help Link */
+      .help-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 32px;
+        color: #0066cc;
+        text-decoration: none;
+        font-size: 16px;
+        width: fit-content;
+      }
+
+      .help-link:hover {
+        text-decoration: underline;
+      }
+
+      .help-icon {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #0066cc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 32px;
+      }
+
+      .tab {
+        flex: 1;
+        background: #fff;
+        border: none;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+
+      .tab:hover {
+        background: #f8f9fa;
+      }
+
+      .tab.active {
+        background: #fff;
+        color: #000;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Applications List */
+      .applications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .application-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px 32px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        transition: box-shadow 0.2s;
+        cursor: pointer;
+      }
+
+      .application-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+
+      .application-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .application-date {
+        color: #666;
+      }
+
+      .application-dot {
+        width: 4px;
+        height: 4px;
+        background: #999;
+        border-radius: 50%;
+      }
+
+      .application-source {
+        color: #666;
+      }
+
+      .application-number {
+        font-size: 20px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 8px;
+      }
+
+      .application-status {
+        display: inline-block;
+        color: #0066cc;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+        font-size: 16px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+
+        .page-title {
+          font-size: 28px;
+        }
+
+        .header {
+          padding: 15px 20px;
+        }
+
+        .phone-search-card {
+          padding: 20px;
+        }
+
+        .phone-number {
+          font-size: 18px;
+        }
+
+        .tabs {
+          flex-direction: column;
+        }
+
+        .application-card {
+          padding: 20px;
+        }
+
+        .application-number {
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect
+            x="5"
+            y="5"
+            width="30"
+            height="30"
+            stroke="#000"
+            stroke-width="2"
+            fill="none"
+          />
+          <path
+            d="M15 20 L20 25 L25 15"
+            stroke="#000"
+            stroke-width="2"
+            fill="none"
+          />
+        </svg>
+      </div>
+      <div class="header-title">Платформа «Лобачевский»</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Мои заявки</h1>
+        <button class="btn-new-application" onclick="createNewApplication()">
+          Подать заявку
+        </button>
+      </div>
+
+      <!-- Phone Search Card -->
+      <div class="phone-search-card" onclick="changePhone()">
+        <div class="phone-search-content">
+          <div class="phone-number" id="phoneNumber">+7 (904) 904-13-28</div>
+          <div class="phone-search-label">Просмотр заявок с этого номера</div>
+        </div>
+        <svg
+          class="arrow-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 5l7 7-7 7"
+          ></path>
+        </svg>
+      </div>
+
+      <!-- Help Link -->
+      <a
+        href="#"
+        class="help-link"
+        onclick="event.preventDefault(); showHelp()"
+      >
+        <span class="help-icon">?</span>
+        Как найти другие заявки
+      </a>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('active', this)">
+          Активные
+        </button>
+        <button class="tab" onclick="switchTab('closed', this)">
+          Закрытые
+        </button>
+      </div>
+
+      <!-- Applications List -->
+      <div class="applications-list" id="applicationsList">
+        <!-- Applications will be dynamically loaded here -->
+      </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+      let allApplications = [];
+      let currentTab = "active";
+      let currentPhone = "";
+
+      // Initialize page
+      async function init() {
+        // Загружаем сохранённый номер телефона
+        const savedPhone = localStorage.getItem("userPhone");
+        if (savedPhone) {
+          currentPhone = savedPhone;
+          document.getElementById("phoneNumber").textContent = currentPhone;
+        } else {
+          // Если номера нет, показываем форму ввода
+          changePhone();
+          return;
+        }
+
+        // Загружаем заявки с сервера
+        await loadApplications();
+      }
+
+      // Загрузить заявки с сервера
+      async function loadApplications() {
+        if (!currentPhone) {
+          renderApplications();
+          return;
+        }
+
+        try {
+          console.log("📥 Загрузка заявок для номера:", currentPhone);
+          allApplications = await ComplaintsAPI.getComplaintsByPhone(
+            currentPhone
+          );
+          console.log("✅ Загружено заявок:", allApplications.length);
+          renderApplications();
+        } catch (error) {
+          console.error("❌ Ошибка загрузки заявок:", error);
+          document.getElementById("applicationsList").innerHTML = `
+            <div class="empty-state">
+              Ошибка загрузки заявок. Убедитесь, что сервер запущен.<br>
+              <small style="color: #999; margin-top: 8px; display: block;">
+                Запустите сервер командой: cd adminka && npm start
+              </small>
+            </div>
+          `;
+        }
+      }
+
+      // Преобразовать дату в читаемый формат
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        const options = { day: "numeric", month: "long", year: "numeric" };
+        return "от " + date.toLocaleDateString("ru-RU", options) + " года";
+      }
+
+      // Определить является ли заявка активной
+      function isActiveStatus(status) {
+        const activeStatuses = [
+          "Новое",
+          "Принято в работу",
+          "На рассмотрении",
+          "В работе",
+        ];
+        return activeStatuses.includes(status);
+      }
+
+      // Render applications
+      function renderApplications() {
+        const container = document.getElementById("applicationsList");
+
+        // Фильтруем заявки по текущей вкладке
+        const filteredApps = allApplications.filter((app) => {
+          if (currentTab === "active") {
+            return isActiveStatus(app.status);
+          } else {
+            return !isActiveStatus(app.status);
+          }
+        });
+
+        if (filteredApps.length === 0) {
+          const message =
+            currentTab === "active"
+              ? "Активных заявок не найдено"
+              : "Закрытых заявок не найдено";
+          container.innerHTML = `
+            <div class="empty-state">
+              ${message}
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filteredApps
+          .map(
+            (app) => `
+          <div class="application-card" onclick="openApplication(${app.id})">
+            <div class="application-header">
+              <span class="application-date">${formatDate(
+                app.created_at || app.created_date
+              )}</span>
+              <span class="application-dot"></span>
+              <span class="application-source">${
+                app.external_system || "Сайт lbch.ru"
+              }</span>
+            </div>
+            <div class="application-number">№${app.id}</div>
+            <div class="application-status">${app.status}</div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      // Switch tab
+      function switchTab(tab, element) {
+        currentTab = tab;
+
+        // Update active tab
+        document.querySelectorAll(".tab").forEach((t) => {
+          t.classList.remove("active");
+        });
+        element.classList.add("active");
+
+        // Render applications for the selected tab
+        renderApplications();
+      }
+
+      // Open application details
+      function openApplication(id) {
+        console.log("Открыть заявку №" + id);
+        // Переход на страницу детального просмотра
+        window.location.href = `complaint-detail.html?id=${id}`;
+      }
+
+      // Create new application
+      function createNewApplication() {
+        window.location.href = "index.html";
+      }
+
+      // Change phone number
+      async function changePhone() {
+        const currentDisplayPhone =
+          document.getElementById("phoneNumber").textContent;
+        const defaultValue =
+          currentDisplayPhone && currentDisplayPhone !== "+7 (___) ___-__-__"
+            ? currentDisplayPhone
+            : "+7 (";
+
+        const newPhone = prompt(
+          "Введите номер телефона для просмотра заявок:",
+          defaultValue
+        );
+
+        if (newPhone && newPhone.trim() !== "") {
+          currentPhone = newPhone.trim();
+          document.getElementById("phoneNumber").textContent = currentPhone;
+          localStorage.setItem("userPhone", currentPhone);
+
+          // Загружаем заявки для нового номера
+          console.log("Загрузка заявок для номера:", currentPhone);
+          await loadApplications();
+        }
+      }
+
+      // Show help
+      function showHelp() {
+        alert(
+          "Чтобы найти заявку:\n\n" +
+            "1. Введите номер телефона, который использовался при подаче заявки\n" +
+            "2. Проверьте раздел 'Активные' для текущих заявок\n" +
+            "3. Проверьте раздел 'Закрытые' для завершённых заявок\n\n" +
+            "Если вы не можете найти свою заявку, свяжитесь с поддержкой: +7 (831) 467-10-01"
+        );
+      }
+
+      // Initialize on page load
+      init();
+    </script>
+  </body>
+</html>
