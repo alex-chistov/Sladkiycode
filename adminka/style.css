@@ -511,7 +511,8 @@ body {
   color: #757575;
 }
 
-.date-input {
+.date-input,
+.date-input[type="datetime-local"] {
   flex: 1;
   border: none;
   background: transparent;

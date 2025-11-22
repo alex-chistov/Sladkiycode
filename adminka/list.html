@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Список заявок - Smartopolis</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background-color: #f5f5f5;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 24px;
+        color: #333;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th {
+        background: #f8f9fa;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        color: #495057;
+      }
+
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+        color: #212529;
+      }
+
+      tr:hover {
+        background: #f8f9fa;
+        cursor: pointer;
+      }
+
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-block;
+      }
+
+      .status-new {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-in-progress {
+        background: #cfe2ff;
+        color: #084298;
+      }
+
+      .status-completed {
+        background: #d1e7dd;
+        color: #0f5132;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .btn-primary {
+        background: #0066cc;
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #0052a3;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📋 Список заявок</h1>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="refreshList()">
+          🔄 Обновить
+        </button>
+        <button class="btn btn-primary" onclick="goToMainPage()">
+          ➕ Создать новую
+        </button>
+      </div>
+
+      <div id="loading" class="loading">Загрузка заявок...</div>
+
+      <div id="error" class="error" style="display: none"></div>
+
+      <div id="tableWrapper" class="table-wrapper" style="display: none">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Заголовок</th>
+              <th>Автор</th>
+              <th>Телефон</th>
+              <th>Статус</th>
+              <th>Источник</th>
+              <th>Дата создания</th>
+            </tr>
+          </thead>
+          <tbody id="complaintsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+      // Загрузить список заявок
+      async function loadComplaints() {
+        try {
+          document.getElementById("loading").style.display = "block";
+          document.getElementById("error").style.display = "none";
+          document.getElementById("tableWrapper").style.display = "none";
+
+          const response = await API.getAllComplaints();
+
+          if (!response || !response.data) {
+            throw new Error("Не удалось получить данные");
+          }
+
+          const complaints = response.data;
+          renderTable(complaints);
+
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("tableWrapper").style.display = "block";
+        } catch (error) {
+          console.error("Ошибка загрузки заявок:", error);
+          document.getElementById("loading").style.display = "none";
+          const errorEl = document.getElementById("error");
+          errorEl.textContent =
+            "Не удалось загрузить список заявок. Убедитесь, что сервер запущен (npm start в папке adminka).";
+          errorEl.style.display = "block";
+        }
+      }
+
+      // Отрисовать таблицу
+      function renderTable(complaints) {
+        const tbody = document.getElementById("complaintsTable");
+        tbody.innerHTML = "";
+
+        if (complaints.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">Заявок пока нет</td></tr>';
+          return;
+        }
+
+        complaints.forEach((complaint) => {
+          const row = document.createElement("tr");
+          row.onclick = () => openComplaint(complaint.id);
+
+          const statusClass = getStatusClass(complaint.status);
+          const date = new Date(complaint.created_at || complaint.created_date);
+          const formattedDate = date.toLocaleString("ru-RU");
+
+          row.innerHTML = `
+            <td><strong>#${complaint.id}</strong></td>
+            <td>${complaint.title || "Без заголовка"}</td>
+            <td>${complaint.author || "-"}</td>
+            <td>${complaint.author_phone || "-"}</td>
+            <td><span class="status-badge ${statusClass}">${
+            complaint.status || "Новое"
+          }</span></td>
+            <td>${complaint.external_system || "Внутренняя"}</td>
+            <td>${formattedDate}</td>
+          `;
+
+          tbody.appendChild(row);
+        });
+      }
+
+      // Получить класс статуса
+      function getStatusClass(status) {
+        if (!status) return "status-new";
+
+        const statusLower = status.toLowerCase();
+
+        if (
+          statusLower.includes("нов") ||
+          statusLower.includes("модер") ||
+          statusLower.includes("рассмотр")
+        ) {
+          return "status-new";
+        }
+
+        if (
+          statusLower.includes("работ") ||
+          statusLower.includes("назнач") ||
+          statusLower.includes("принят")
+        ) {
+          return "status-in-progress";
+        }
+
+        if (
+          statusLower.includes("решен") ||
+          statusLower.includes("выполнен") ||
+          statusLower.includes("закрыт")
+        ) {
+          return "status-completed";
+        }
+
+        return "status-new";
+      }
+
+      // Открыть заявку
+      function openComplaint(id) {
+        window.location.href = `/?id=${id}`;
+      }
+
+      // Обновить список
+      function refreshList() {
+        loadComplaints();
+      }
+
+      // Перейти на главную страницу
+      function goToMainPage() {
+        window.location.href = "/";
+      }
+
+      // Загрузить при открытии страницы
+      window.addEventListener("load", loadComplaints);
+    </script>
+  </body>
+</html>

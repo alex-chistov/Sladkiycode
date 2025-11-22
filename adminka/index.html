@@ -334,11 +334,8 @@
               <div class="form-field select-field">
                 <label><span class="required">*</span> Действия</label>
                 <div class="field-value">
-                  <select class="custom-select">
-                    <option>Новое</option>
-                    <option>Назначить ответственному</option>
-                    <option>Отклонение</option>
-                    <option>Действие снято в ручном режиме</option>
+                  <select class="custom-select" id="actionSelect">
+                    <option value="">Выберите действие</option>
                   </select>
                 </div>
               </div>
@@ -536,9 +533,10 @@
                   <div class="date-input-group">
                     <span class="calendar-icon">📅</span>
                     <input
-                      type="text"
+                      type="datetime-local"
                       class="date-input"
-                      value="2025-11-28 00:00:00"
+                      id="deadlineInput"
+                      required
                     />
                   </div>
                 </div>

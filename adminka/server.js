@@ -15,9 +15,14 @@ app.use(express.static(__dirname));
 // Статические файлы для loba4
 app.use("/loba4", express.static(path.join(__dirname, "../loba4")));
 
-// Главная страница
+// Главная страница (админка)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// Список заявок
+app.get("/list.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "list.html"));
 });
 
 // API: Получить все заявки
