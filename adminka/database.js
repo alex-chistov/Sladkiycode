@@ -15,7 +15,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Инициализация таблиц
 function initDatabase() {
   // Таблица заявок
-  db.run(`
+  db.run(
+    `
     CREATE TABLE IF NOT EXISTS complaints (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
@@ -43,10 +44,53 @@ function initDatabase() {
       external_category TEXT,
       link TEXT,
       status TEXT DEFAULT 'Новое',
+      official_response TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `,
+    (err) => {
+      if (err) {
+        console.error("❌ Ошибка создания таблицы complaints:", err);
+      } else {
+        // Проверяем существование колонки official_response и добавляем, если её нет
+        db.all("PRAGMA table_info(complaints)", [], (pragmaErr, columns) => {
+          if (pragmaErr) {
+            console.error("❌ Ошибка проверки структуры таблицы:", pragmaErr);
+            return;
+          }
+
+          // Проверяем, есть ли колонка official_response
+          const hasOfficialResponse = columns.some(
+            (col) => col.name === "official_response"
+          );
+
+          if (!hasOfficialResponse) {
+            // Добавляем колонку official_response
+            db.run(
+              `ALTER TABLE complaints ADD COLUMN official_response TEXT`,
+              (alterErr) => {
+                if (alterErr) {
+                  console.error(
+                    "❌ Ошибка добавления колонки official_response:",
+                    alterErr.message
+                  );
+                } else {
+                  console.log(
+                    "✅ Колонка official_response добавлена в таблицу complaints"
+                  );
+                }
+              }
+            );
+          } else {
+            console.log(
+              "ℹ️ Колонка official_response уже существует в таблице complaints"
+            );
+          }
+        });
+      }
+    }
+  );
 
   // Таблица истории изменений
   db.run(`

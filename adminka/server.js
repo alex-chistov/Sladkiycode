@@ -97,11 +97,25 @@ app.put("/api/complaints/:id", (req, res) => {
   const id = req.params.id;
   const data = req.body;
 
+  console.log("📥 PUT /api/complaints/:id", {
+    id,
+    data,
+    status: data.status,
+  });
+
   db.updateComplaint(id, data, function (err) {
     if (err) {
+      console.error("❌ Ошибка обновления заявки в БД:", err);
       res.status(500).json({ error: err.message });
       return;
     }
+
+    console.log("✅ Заявка обновлена в БД:", {
+      id,
+      changes: this.changes,
+      status: data.status,
+    });
+
     res.json({
       message: "Заявка обновлена успешно",
       changes: this.changes,

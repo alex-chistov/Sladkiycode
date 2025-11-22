@@ -772,11 +772,11 @@ document.addEventListener("DOMContentLoaded", function () {
             await API.updateComplaint(complaintId, complaintData);
             alert("✅ Данные обновлены в базе данных!");
 
-            // Добавляем запись в историю
-            await API.addHistory({
+          // Добавляем запись в историю
+          await API.addHistory({
               complaint_id: complaintId,
-              change_date: new Date().toISOString(),
-              author: "[276] Аналитический центр города",
+            change_date: new Date().toISOString(),
+            author: "[276] Аналитический центр города",
               field_name: "Данные заявки",
               old_value: "",
               new_value: "Обновлено",
@@ -947,13 +947,28 @@ document.addEventListener("DOMContentLoaded", function () {
           // Определяем новый статус по действию и текущему статусу
           const newStatus = mapActionToStatus(selectedAction, currentStatus);
 
+          // ВАЖНО: Проверяем, что статус определен
+          if (!newStatus || newStatus === "") {
+            console.error(
+              "❌ ОШИБКА: Статус не определен! selectedAction:",
+              selectedAction,
+              "currentStatus:",
+              currentStatus
+            );
+            alert(
+              "❌ Ошибка: Не удалось определить новый статус. Проверьте консоль."
+            );
+            return;
+          }
+
           // Сохраняем статус в глобальную переменную
           lastSavedStatus = newStatus;
 
-          console.log("Маппинг действия на статус:", {
+          console.log("✅ Маппинг действия на статус:", {
             selectedAction: selectedAction,
             currentStatus: currentStatus,
             newStatus: newStatus,
+            lastSavedStatus: lastSavedStatus,
           });
 
           const deadlineInput = document.getElementById("deadlineInput");
@@ -994,10 +1009,19 @@ document.addEventListener("DOMContentLoaded", function () {
           };
 
           // Обновляем заявку с новым статусом
+          // ВАЖНО: Убеждаемся, что статус всегда передается
           const updateData = {
-            status: newStatus,
-            deadline: deadlineValue,
+            status: newStatus || "Новое",
+            deadline: deadlineValue || null,
           };
+
+          // ВАЖНО: Логируем перед отправкой
+          console.log(
+            "🔍 updateData перед отправкой:",
+            JSON.stringify(updateData, null, 2)
+          );
+          console.log("🔍 newStatus:", newStatus);
+          console.log("🔍 typeof newStatus:", typeof newStatus);
 
           if (processingData.assigned_to) {
             updateData.assigned_to = processingData.assigned_to;
@@ -1024,6 +1048,14 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("📤 Сохранение в БД. ID:", complaintId);
           console.log("📤 Данные для сохранения:", updateData);
           console.log("📤 Новый статус:", newStatus);
+          console.log("📤 Старый статус:", oldStatus);
+          console.log("📤 Текущий статус:", currentStatus);
+
+          // ВАЖНО: Убеждаемся, что статус точно передается в updateData
+          if (!updateData.status || updateData.status !== newStatus) {
+            console.log("⚠️ Статус не совпадает! Исправляем...");
+            updateData.status = newStatus;
+          }
 
           const updateResult = await API.updateComplaint(
             complaintId,
@@ -1031,6 +1063,12 @@ document.addEventListener("DOMContentLoaded", function () {
           );
           console.log("✅ Результат обновления заявки:", updateResult);
           console.log("✅ Обновленные данные:", updateData);
+
+          // ВАЖНО: Проверяем, что статус действительно сохранился
+          console.log(
+            "🔍 Проверка сохраненного статуса в updateData:",
+            updateData.status
+          );
 
           alert("✅ Форма успешно отправлена и сохранена в БД!");
 
@@ -1045,7 +1083,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
 
           // Задержка для гарантии сохранения в БД
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 800));
 
           // Перезагружаем данные заявки для обновления формы
           console.log("🔄 Перезагрузка данных из БД после сохранения...");
@@ -1059,11 +1097,74 @@ document.addEventListener("DOMContentLoaded", function () {
               "Новый статус (отправленный):",
               newStatus,
               "Статус из БД:",
-              updatedComplaint.status
+              updatedComplaint.status,
+              "Тип статуса из БД:",
+              typeof updatedComplaint.status
             );
 
             const statusFromDB = normalizeStatus(updatedComplaint.status);
-            const finalStatus = statusFromDB || newStatus || "Новое";
+
+            // ВАЖНО: Если статус из БД не совпадает с отправленным, принудительно обновляем
+            let finalStatus = newStatus; // По умолчанию используем отправленный статус
+
+            if (
+              statusFromDB &&
+              statusFromDB !== "" &&
+              statusFromDB === newStatus
+            ) {
+              // Статус совпадает - отлично
+              finalStatus = statusFromDB;
+              console.log(
+                "✅ Статус из БД совпадает с отправленным:",
+                finalStatus
+              );
+            } else if (
+              statusFromDB &&
+              statusFromDB !== "" &&
+              statusFromDB !== newStatus
+            ) {
+              // Статус из БД отличается - используем отправленный и обновляем БД
+              console.log(
+                "⚠️ Статус из БД отличается! БД:",
+                statusFromDB,
+                "Отправленный:",
+                newStatus
+              );
+              console.log("⚠️ Принудительно обновляем БД...");
+              await API.updateComplaint(complaintId, { status: newStatus });
+              finalStatus = newStatus;
+              // Ждем еще немного для гарантии
+              await new Promise((resolve) => setTimeout(resolve, 500));
+              // Перезагружаем еще раз
+              const recheckResponse = await API.getComplaint(complaintId);
+              if (recheckResponse && recheckResponse.data) {
+                const recheckStatus = normalizeStatus(
+                  recheckResponse.data.status
+                );
+                if (recheckStatus === newStatus) {
+                  finalStatus = recheckStatus;
+                  console.log(
+                    "✅ Статус подтвержден после принудительного обновления:",
+                    finalStatus
+                  );
+                }
+              }
+            } else {
+              // Статус из БД пустой или не совпадает - используем отправленный
+              console.log(
+                "⚠️ Статус из БД пустой или не совпадает. Используем отправленный:",
+                newStatus
+              );
+              if (!statusFromDB || statusFromDB === "") {
+                // Принудительно обновляем БД
+                console.log(
+                  "⚠️ Принудительно обновляем БД с новым статусом..."
+                );
+                await API.updateComplaint(complaintId, { status: newStatus });
+                await new Promise((resolve) => setTimeout(resolve, 500));
+              }
+              finalStatus = newStatus;
+            }
 
             // Сохраняем статус в глобальную переменную и localStorage
             lastSavedStatus = finalStatus;
@@ -1072,6 +1173,7 @@ document.addEventListener("DOMContentLoaded", function () {
               "💾 Сохранен lastSavedStatus и в localStorage:",
               finalStatus
             );
+            console.log("💾 Проверка: lastSavedStatus =", lastSavedStatus);
 
             // Обновляем все поля формы с новыми данными
             // ВАЖНО: fillFormFields также обновляет опции, но мы обновим их после с правильным статусом
@@ -1081,9 +1183,34 @@ document.addEventListener("DOMContentLoaded", function () {
             // Это гарантирует, что опции будут правильными даже если fillFormFields их перезапишет
             console.log(
               "🔄 Принудительное обновление опций после сохранения. Финальный статус:",
-              finalStatus
+              finalStatus,
+              "lastSavedStatus:",
+              lastSavedStatus
             );
+
+            // ВАЖНО: Используем finalStatus, а не lastSavedStatus, чтобы гарантировать правильность
             updateActionOptions(finalStatus);
+
+            // Дополнительная проверка через небольшую задержку
+            setTimeout(() => {
+              const actionSelect = document.getElementById("actionSelect");
+              if (actionSelect) {
+                const currentOptions = Array.from(actionSelect.options).map(
+                  (opt) => opt.value
+                );
+                console.log(
+                  "🔍 Проверка опций после обновления:",
+                  currentOptions
+                );
+                console.log("🔍 Ожидаемый статус:", finalStatus);
+
+                // Если опции не правильные, обновляем еще раз
+                if (currentOptions.length <= 1) {
+                  console.log("⚠️ Опции пустые! Принудительно обновляем...");
+                  updateActionOptions(finalStatus);
+                }
+              }
+            }, 100);
 
             // ВАЖНО: Автоматическая проверка и исправление статуса через задержку
             setTimeout(async () => {

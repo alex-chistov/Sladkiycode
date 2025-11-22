@@ -44,6 +44,12 @@ const API = {
 
   async updateComplaint(id, complaintData) {
     try {
+      console.log("📤 API.updateComplaint вызван:", {
+        id,
+        complaintData,
+        status: complaintData.status,
+      });
+
       const response = await fetch(`${API_URL}/complaints/${id}`, {
         method: "PUT",
         headers: {
@@ -51,10 +57,18 @@ const API = {
         },
         body: JSON.stringify(complaintData),
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ Ошибка ответа сервера:", response.status, errorText);
+        throw new Error(`Ошибка обновления: ${response.status} ${errorText}`);
+      }
+
       const data = await response.json();
+      console.log("✅ API.updateComplaint успешно:", data);
       return data;
     } catch (error) {
-      console.error("Ошибка обновления заявки:", error);
+      console.error("❌ Ошибка обновления заявки:", error);
       throw error;
     }
   },
