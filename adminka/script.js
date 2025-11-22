@@ -6,7 +6,7 @@ function normalizeStatus(status) {
   return normalized === "" ? "" : normalized;
 }
 
-// Функции для работы с localStorage
+// Функции для работы с localStorage для надежного сохранения статуса
 function saveStatusToStorage(complaintId, status) {
   if (complaintId && status) {
     const key = `complaint_status_${complaintId}`;
@@ -32,6 +32,54 @@ function clearStatusFromStorage(complaintId) {
     const key = `complaint_status_${complaintId}`;
     localStorage.removeItem(key);
     console.log("🗑️ Удален статус из localStorage:", key);
+  }
+}
+
+// Функция для автоматической проверки и исправления статуса
+async function verifyAndFixStatus(complaintId) {
+  if (!complaintId) return null;
+
+  try {
+    // Загружаем статус из БД
+    const response = await API.getComplaint(complaintId);
+    if (!response || !response.data) return null;
+
+    const statusFromDB = normalizeStatus(response.data.status);
+    const statusFromStorage = getStatusFromStorage(complaintId);
+
+    console.log("🔍 Проверка статуса:", {
+      complaintId,
+      statusFromDB,
+      statusFromStorage,
+      lastSavedStatus,
+    });
+
+    // Определяем правильный статус
+    let correctStatus =
+      statusFromDB || statusFromStorage || lastSavedStatus || "Новое";
+
+    // Если статус из БД отличается от сохраненного, используем БД как источник истины
+    if (statusFromDB && statusFromDB !== statusFromStorage) {
+      correctStatus = statusFromDB;
+      saveStatusToStorage(complaintId, correctStatus);
+      console.log("✅ Исправлен статус: использован статус из БД");
+    } else if (statusFromStorage && !statusFromDB) {
+      // Если в БД нет статуса, но есть в localStorage, используем его
+      correctStatus = statusFromStorage;
+      console.log("✅ Использован статус из localStorage");
+    }
+
+    // Обновляем глобальную переменную
+    lastSavedStatus = correctStatus;
+
+    // Обновляем опции на основе правильного статуса
+    updateActionOptions(correctStatus);
+
+    console.log("✅ Статус проверен и исправлен:", correctStatus);
+    return correctStatus;
+  } catch (error) {
+    console.error("❌ Ошибка при проверке статуса:", error);
+    return null;
   }
 }
 
@@ -63,13 +111,11 @@ async function loadComplaintData() {
     console.log("✅ Заявка загружена:", complaint);
     console.log("📊 Статус заявки при загрузке:", complaint.status);
 
-    // Пытаемся загрузить статус из localStorage
-    const savedStatus = getStatusFromStorage(complaintId);
-
     // Определяем статус: сначала из localStorage, потом из БД, потом "Новое"
+    const savedStatus = getStatusFromStorage(complaintId);
     const normalizedStatus = normalizeStatus(complaint.status);
-    let finalStatus;
 
+    let finalStatus;
     if (savedStatus) {
       // Используем сохраненный статус из localStorage
       finalStatus = savedStatus;
@@ -78,7 +124,7 @@ async function loadComplaintData() {
       // Используем статус из БД
       finalStatus = normalizedStatus;
       console.log("💾 Используем статус из БД:", finalStatus);
-      // Сохраняем в localStorage для будущих обновлений
+      // Сохраняем в localStorage
       saveStatusToStorage(complaintId, finalStatus);
     } else {
       // Если статуса нет, считаем заявку новой
@@ -89,18 +135,33 @@ async function loadComplaintData() {
 
     // Сохраняем статус в глобальную переменную
     lastSavedStatus = finalStatus;
+    console.log("💾 Текущий статус (финальный):", finalStatus);
 
     // Заполняем поля формы
     fillFormFields(complaint);
 
     // Обновляем ID в заголовке
-    document.querySelector(".id-field span").textContent = complaint.id;
+    const idSpan = document.querySelector(".id-field span");
+    if (idSpan) {
+      idSpan.textContent = complaint.id;
+    }
 
     // Обновляем заголовок страницы
     document.title = `Обращение № ${complaint.id} - Smartopolis`;
 
     // Загружаем историю изменений
     loadHistory(complaintId);
+
+    // ВАЖНО: Автоматически проверяем и исправляем статус после загрузки страницы
+    setTimeout(async () => {
+      const verifiedStatus = await verifyAndFixStatus(complaintId);
+      if (verifiedStatus) {
+        console.log(
+          "✅ Статус автоматически проверен при загрузке страницы:",
+          verifiedStatus
+        );
+      }
+    }, 300);
   } catch (error) {
     console.error("❌ Ошибка загрузки заявки:", error);
     alert(
@@ -206,26 +267,21 @@ function fillFormFields(complaint) {
     // Обновляем поля на вкладке "Обработка"
     updateProcessingTab(complaint);
 
-    // Определяем статус для опций
-    // ВАЖНО: Используем lastSavedStatus, который был установлен при загрузке страницы
-    // Это гарантирует, что при F5 опции не сбросятся
+    // Статус для опций действий: берем из localStorage, потом из БД, потом lastSavedStatus
     const complaintId = getComplaintIdFromUrl();
     const savedStatus = complaintId ? getStatusFromStorage(complaintId) : null;
     const statusFromDb = normalizeStatus(complaint.status);
     const statusForOptions =
-      savedStatus || lastSavedStatus || statusFromDb || "Новое";
+      savedStatus ||
+      statusFromDb ||
+      normalizeStatus(lastSavedStatus) ||
+      "Новое";
 
-    // Обновляем lastSavedStatus на основе статуса из localStorage или БД
-    if (savedStatus) {
-      lastSavedStatus = savedStatus;
-      console.log(
-        "💾 Используем статус из localStorage в fillFormFields:",
-        lastSavedStatus
-      );
-    } else if (statusFromDb && statusFromDb !== lastSavedStatus) {
-      lastSavedStatus = statusFromDb;
-      if (complaintId) {
-        saveStatusToStorage(complaintId, statusFromDb);
+    // Обновляем lastSavedStatus и localStorage
+    if (statusForOptions !== lastSavedStatus) {
+      lastSavedStatus = statusForOptions;
+      if (complaintId && statusForOptions) {
+        saveStatusToStorage(complaintId, statusForOptions);
       }
       console.log(
         "💾 Обновлен lastSavedStatus в fillFormFields:",
@@ -234,11 +290,20 @@ function fillFormFields(complaint) {
     }
 
     // Обновляем опции действий с правильным статусом
-    console.log(
-      "🔄 Обновление опций при загрузке формы. Статус:",
-      statusForOptions
-    );
-    updateActionOptions(statusForOptions);
+    // ВАЖНО: Обновляем опции только если мы на вкладке "Обработка" или если это начальная загрузка
+    const processingTab = document.getElementById("tab-processing");
+    if (!processingTab || processingTab.classList.contains("active")) {
+      console.log(
+        "🔄 Обновление опций при загрузке формы. Статус:",
+        statusForOptions
+      );
+      updateActionOptions(statusForOptions);
+    } else {
+      console.log(
+        "💾 Сохранен статус для будущих обновлений (не на вкладке Обработка):",
+        statusForOptions
+      );
+    }
   }
 }
 
@@ -275,11 +340,12 @@ function updateProcessingTab(complaint) {
     }
   }
 
-  // Обновляем опции действий в зависимости от статуса (используем сохраненный)
+  // Обновляем опции действий в зависимости от статуса
   const statusForOptions =
-    normalizeStatus(lastSavedStatus) ||
     normalizeStatus(complaint.status) ||
+    normalizeStatus(lastSavedStatus) ||
     "Новое";
+  lastSavedStatus = statusForOptions;
   updateActionOptions(statusForOptions);
 }
 
@@ -373,20 +439,8 @@ function updateActionOptions(currentStatus) {
       { value: "Закрыть", text: "Закрыть" },
     ];
     console.log("✅ Шаг 5: Предварительно решено - опции для модератора");
-    console.log(
-      "🔍 Проверка: normalizedStatus === 'Предварительно решено':",
-      normalizedStatus === "Предварительно решено"
-    );
-    console.log(
-      "🔍 Проверка: normalizedStatus:",
-      JSON.stringify(normalizedStatus)
-    );
-    console.log(
-      "🔍 Проверка: длина normalizedStatus:",
-      normalizedStatus.length
-    );
   } else if (normalizedStatus === "На рассмотрении") {
-    // Альтернативный статус для модератора
+    // На случай, если этот статус уже есть в БД — ведём как финальную модерацию
     options = [
       { value: "Назначить ответственного", text: "Назначить ответственного" },
       { value: "Закрыть", text: "Закрыть" },
@@ -419,6 +473,64 @@ function updateActionOptions(currentStatus) {
     "Опции:",
     options.map((o) => o.text)
   );
+}
+
+/**
+ * Маппинг действия → новый статус с учётом текущего этапа.
+ * Важно:
+ * - Новое → На модерации
+ * - На модерации → Назначено ответственному
+ * - Назначено ответственному → Взято в работу ответственным
+ * - Взято в работу ответственным / В работе → при "На модерации" или "Предварительно решено"
+ *   переходим в "Предварительно решено", чтобы модератор сразу получил набор: Назначить / Закрыть
+ */
+function mapActionToStatus(selectedAction, currentStatus) {
+  const current = normalizeStatus(currentStatus);
+
+  console.log("🧭 mapActionToStatus", {
+    currentStatus: current,
+    selectedAction,
+  });
+
+  switch (selectedAction) {
+    case "На модерации":
+      // 1) Новая заявка → первый шаг модератора
+      if (!current || current === "Новое" || current === "") {
+        return "На модерации";
+      }
+
+      // 2) Исполнитель завершил работу и отправляет на модерацию
+      //    Тут сразу переходим к шагу модератора с возможностью "Закрыть"
+      if (
+        current === "Взято в работу ответственным" ||
+        current === "В работе"
+      ) {
+        return "Предварительно решено";
+      }
+
+      // Во всех остальных случаях оставляем как есть
+      return "На модерации";
+
+    case "Предварительно решено":
+      // Исполнитель явно указывает, что проблема решена
+      // и отправляет на финальную проверку модератору
+      return "Предварительно решено";
+
+    case "Назначить ответственного":
+      return "Назначено ответственному";
+
+    case "Взять работу ответственным":
+      return "Взято в работу ответственным";
+
+    case "Отклонено":
+      return "Отклонено";
+
+    case "Закрыть":
+      return "Закрыто";
+
+    default:
+      return selectedAction;
+  }
 }
 
 // Загрузить историю изменений
@@ -541,49 +653,36 @@ document.addEventListener("DOMContentLoaded", function () {
       if (tabName === "processing") {
         const complaintId = getComplaintIdFromUrl();
         if (complaintId) {
-          // Загружаем текущий статус и обновляем опции
-          API.getComplaint(complaintId)
-            .then((response) => {
-              if (response && response.data) {
-                // ВАЖНО: Используем статус из localStorage, если он есть
-                const savedStatus = getStatusFromStorage(complaintId);
-                const statusFromDb = normalizeStatus(response.data.status);
-                const statusForOptions =
-                  savedStatus || lastSavedStatus || statusFromDb || "Новое";
-
-                // Сохраняем статус в глобальную переменную и localStorage
-                lastSavedStatus = statusForOptions;
-                if (statusForOptions && statusForOptions !== savedStatus) {
-                  saveStatusToStorage(complaintId, statusForOptions);
-                }
-
-                // Обновляем lastSavedStatus на основе статуса из БД, если он есть и отличается
-                if (statusFromDb && statusFromDb !== lastSavedStatus) {
-                  lastSavedStatus = statusFromDb;
-                  console.log(
-                    "💾 Обновлен lastSavedStatus при переключении на Обработку:",
-                    lastSavedStatus
-                  );
-                }
-
+          // ВАЖНО: Автоматически проверяем и исправляем статус при переключении на вкладку
+          // ВАЖНО: Автоматически проверяем и исправляем статус при переключении на вкладку
+          verifyAndFixStatus(complaintId)
+            .then((correctStatus) => {
+              if (correctStatus) {
                 console.log(
-                  "🔄 Переключение на Обработку. Статус из БД:",
-                  response.data.status,
-                  "Последний сохраненный:",
-                  lastSavedStatus
+                  "✅ Статус проверен при переключении на Обработку:",
+                  correctStatus
                 );
-
+              } else {
+                // Если проверка не удалась, используем сохраненный статус
+                const savedStatus = getStatusFromStorage(complaintId);
+                const statusForOptions =
+                  savedStatus || lastSavedStatus || "Новое";
+                lastSavedStatus = statusForOptions;
                 updateActionOptions(statusForOptions);
+                console.log(
+                  "🔄 Использован сохраненный статус:",
+                  statusForOptions
+                );
               }
             })
             .catch((error) => {
-              console.error("Ошибка загрузки статуса:", error);
+              console.error("Ошибка при проверке статуса:", error);
               // Если ошибка, используем последний сохраненный статус
-              if (lastSavedStatus) {
-                updateActionOptions(lastSavedStatus);
-              } else {
-                updateActionOptions("Новое");
-              }
+              const savedStatus = getStatusFromStorage(complaintId);
+              const statusForOptions =
+                savedStatus || lastSavedStatus || "Новое";
+              lastSavedStatus = statusForOptions;
+              updateActionOptions(statusForOptions);
             });
         } else {
           // Если нет ID, показываем опции для новой заявки
@@ -689,7 +788,11 @@ document.addEventListener("DOMContentLoaded", function () {
               const updatedComplaint = updatedResponse.data;
 
               // Обновляем опции действий с новым статусом
-              updateActionOptions(updatedComplaint.status);
+              const statusFromDb = normalizeStatus(updatedComplaint.status);
+              const statusForOptions =
+                statusFromDb || normalizeStatus(lastSavedStatus) || "Новое";
+              lastSavedStatus = statusForOptions;
+              updateActionOptions(statusForOptions);
 
               // Обновляем статус в кнопке на вкладке "Подробно"
               const statusBtn = document.querySelector(".btn-dark");
@@ -832,33 +935,25 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
           }
 
-          // Получаем текущий статус для истории
+          // Получаем текущий статус для истории и для маппинга
           const currentComplaint = await API.getComplaint(complaintId);
           const oldStatus = currentComplaint?.data?.status || "";
+          const currentStatus = oldStatus;
 
           // Собираем данные из формы обработки
           const actionSelect = document.getElementById("actionSelect");
           const selectedAction = actionSelect?.value || "";
 
-          // Маппинг действий на статусы
-          const actionToStatusMap = {
-            "На модерации": "На модерации", // Первый этап: отправка на модерацию
-            Отклонено: "Отклонено",
-            "Назначить ответственного": "Назначено ответственному",
-            "Взять работу ответственным": "Взято в работу ответственным",
-            "Предварительно решено": "Предварительно решено", // Статус остается для модератора
-            Закрыть: "Закрыто",
-          };
-
-          const newStatus = actionToStatusMap[selectedAction] || selectedAction;
+          // Определяем новый статус по действию и текущему статусу
+          const newStatus = mapActionToStatus(selectedAction, currentStatus);
 
           // Сохраняем статус в глобальную переменную
           lastSavedStatus = newStatus;
 
           console.log("Маппинг действия на статус:", {
             selectedAction: selectedAction,
+            currentStatus: currentStatus,
             newStatus: newStatus,
-            map: actionToStatusMap,
           });
 
           const deadlineInput = document.getElementById("deadlineInput");
@@ -919,8 +1014,6 @@ document.addEventListener("DOMContentLoaded", function () {
               );
               return;
             }
-            // При "Предварительно решено" заявка возвращается модератору
-            // Статус меняется на "На модерации" через маппинг
           }
 
           // Всегда сохраняем официальный ответ, если он заполнен
@@ -963,31 +1056,20 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(
               "📊 Данные из БД после сохранения. Старый статус:",
               oldStatus,
-              "Новый статус (сохраненный):",
+              "Новый статус (отправленный):",
               newStatus,
               "Статус из БД:",
-              updatedComplaint.status,
-              "Тип статуса из БД:",
-              typeof updatedComplaint.status
+              updatedComplaint.status
             );
 
-            // ВАЖНО: Сначала обновляем lastSavedStatus, чтобы при F5 опции были правильными
-            // Используем статус из БД как источник истины
             const statusFromDB = normalizeStatus(updatedComplaint.status);
             const finalStatus = statusFromDB || newStatus || "Новое";
 
-            // Сохраняем статус в глобальную переменную для будущих обновлений (включая F5)
+            // Сохраняем статус в глобальную переменную и localStorage
             lastSavedStatus = finalStatus;
-
-            // ВАЖНО: Сохраняем статус в localStorage для сохранения после обновления страницы
             saveStatusToStorage(complaintId, finalStatus);
-
             console.log(
-              "💾 Обновлен lastSavedStatus после сохранения. Сохраненный статус:",
-              newStatus,
-              "Статус из БД:",
-              updatedComplaint.status,
-              "→ Финальный статус (сохранен в lastSavedStatus и localStorage):",
+              "💾 Сохранен lastSavedStatus и в localStorage:",
               finalStatus
             );
 
@@ -995,104 +1077,29 @@ document.addEventListener("DOMContentLoaded", function () {
             // ВАЖНО: fillFormFields также обновляет опции, но мы обновим их после с правильным статусом
             fillFormFields(updatedComplaint);
 
-            // Обновляем опции действий с финальным статусом
-            // ВАЖНО: Используем finalStatus, который сохранен в lastSavedStatus
-            // Это должно быть сделано ПОСЛЕ fillFormFields, чтобы перезаписать опции правильным статусом
+            // ВАЖНО: Принудительно обновляем опции ПОСЛЕ fillFormFields с правильным статусом
+            // Это гарантирует, что опции будут правильными даже если fillFormFields их перезапишет
             console.log(
-              "🔄 Обновление опций после сохранения. Старый статус:",
-              oldStatus,
-              "Новый статус (сохраненный):",
-              newStatus,
-              "Статус из БД:",
-              updatedComplaint.status,
-              "→ Финальный статус:",
+              "🔄 Принудительное обновление опций после сохранения. Финальный статус:",
               finalStatus
             );
             updateActionOptions(finalStatus);
 
-            // Дополнительная проверка: убеждаемся, что опции действительно обновились
-            setTimeout(() => {
-              const actionSelect = document.getElementById("actionSelect");
-              if (actionSelect) {
-                const currentOptions = Array.from(actionSelect.options).map(
-                  (opt) => opt.value
-                );
+            // ВАЖНО: Автоматическая проверка и исправление статуса через задержку
+            setTimeout(async () => {
+              const verifiedStatus = await verifyAndFixStatus(complaintId);
+              if (verifiedStatus) {
                 console.log(
-                  "🔍 Текущие опции в select после обновления:",
-                  currentOptions
+                  "✅ Статус автоматически проверен и исправлен после сохранения:",
+                  verifiedStatus
                 );
-                console.log("🔍 Ожидаемый статус для опций:", finalStatus);
-
-                // Если опции не обновились правильно, принудительно обновляем еще раз
-                if (finalStatus === "На модерации") {
-                  const hasCorrectOptions =
-                    currentOptions.includes("Назначить ответственного") &&
-                    currentOptions.includes("Отклонено");
-                  if (!hasCorrectOptions) {
-                    console.log(
-                      "⚠️ Опции не обновились правильно для 'На модерации'! Принудительно обновляем..."
-                    );
-                    updateActionOptions(finalStatus);
-                  }
-                } else if (finalStatus === "Предварительно решено") {
-                  const hasCorrectOptions =
-                    currentOptions.includes("Назначить ответственного") &&
-                    currentOptions.includes("Закрыть");
-                  if (!hasCorrectOptions) {
-                    console.log(
-                      "⚠️ Опции не обновились правильно для 'Предварительно решено'! Принудительно обновляем..."
-                    );
-                    updateActionOptions(finalStatus);
-                  }
-                }
               }
-            }, 100);
-
-            // Принудительно обновляем опции еще раз через небольшую задержку
-            // ВАЖНО: Используем finalStatus, который сохранен в lastSavedStatus
-            setTimeout(() => {
-              // Перезагружаем данные из БД еще раз для гарантии
-              API.getComplaint(complaintId)
-                .then((recheckResponse) => {
-                  if (recheckResponse && recheckResponse.data) {
-                    const recheckStatus = normalizeStatus(
-                      recheckResponse.data.status
-                    );
-                    const finalRecheckStatus =
-                      recheckStatus || finalStatus || "Новое";
-
-                    lastSavedStatus = finalRecheckStatus;
-                    // Сохраняем в localStorage
-                    saveStatusToStorage(complaintId, finalRecheckStatus);
-                    updateActionOptions(finalRecheckStatus);
-                    console.log(
-                      "🔄 Финальное обновление опций со статусом из БД:",
-                      finalRecheckStatus,
-                      "(lastSavedStatus:",
-                      lastSavedStatus,
-                      ")"
-                    );
-                  } else {
-                    updateActionOptions(finalStatus);
-                    console.log(
-                      "🔄 Принудительное обновление опций со статусом:",
-                      finalStatus,
-                      "(lastSavedStatus:",
-                      lastSavedStatus,
-                      ")"
-                    );
-                  }
-                })
-                .catch((error) => {
-                  console.error("Ошибка при перезагрузке данных:", error);
-                  updateActionOptions(finalStatus);
-                });
-            }, 300);
+            }, 200);
 
             // Сбрасываем выбранное действие
-            const actionSelect = document.getElementById("actionSelect");
-            if (actionSelect) {
-              actionSelect.value = "";
+            const actionSelectEl = document.getElementById("actionSelect");
+            if (actionSelectEl) {
+              actionSelectEl.value = "";
             }
 
             // Переключаемся на вкладку "Подробно"
